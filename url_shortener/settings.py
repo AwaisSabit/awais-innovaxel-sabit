@@ -37,7 +37,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Django Rest Framework
+
+    'rest_framework',
 ]
+
+# External apps
+
+EXT_APPS = [
+    'shortener',
+]
+
+# Combine INSTALLED_APPS and EXT_APPS
+
+INSTALLED_APPS += EXT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
