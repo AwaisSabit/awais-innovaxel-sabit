@@ -50,6 +50,9 @@ def retrive_update_delete_url(request, short_code):
     if request.method == 'GET':
         serializer = ShortURLSerializer(short_url)
 
+        short_url.access_count += 1
+        short_url.save(update_fields=['access_count'])
+
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     elif request.method == 'PUT':
@@ -81,4 +84,17 @@ def retrive_update_delete_url(request, short_code):
         short_url.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
+@api_view(['GET'])
+def get_url_statistics(request, short_code):
+    short_url = get_object_or_404(ShortURL, short_code=short_code)
+
+    return Response({
+        "id": short_url.id,
+        "url": short_url.original_url,
+        "shortCode": short_url.short_code,
+        "createdAt": short_url.created_at,
+        "updatedAt": short_url.updated_at,
+        "accessCount": short_url.access_count
+    }, status=status.HTTP_200_OK)
