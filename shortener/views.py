@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import json
@@ -42,4 +42,14 @@ def create_short_url(request):
     except IntegrityError:
         return error_response('Short URL creation failed. Try again!', status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def retrive_original_url_by_short_url(request, short_code):
 
+    short_url = get_object_or_404(ShortURL, short_code=short_code)
+
+    serializer = ShortURLSerializer(short_url)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+def index(request):
+    return render(request, 'index.html')

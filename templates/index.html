@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            width: 250px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Retrieve Original URL</h2>
+<input type="text" id="short-code" placeholder="Enter short code (e.g., abc123)">
+<button onclick="retrieveURL()">Go</button>
+
+<script>
+    const API_BASE = "http://127.0.0.1:8000/api/shortener/";
+
+    function retrieveURL() {
+        let shortCode = document.getElementById("short-code").value.trim();
+        
+        if (!shortCode) {
+            alert("Please enter a valid short code.");
+            return;
+        }
+
+        fetch(`${API_BASE}${shortCode}`, { method: "GET" })
+        .then(response => {
+            if (!response.ok) {
+                alert("Short URL not found.");
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.original_url) {
+                window.location.href = data.original_url;  // Redirect user to the original URL
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+</body>
+</html>
