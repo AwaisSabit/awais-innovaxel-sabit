@@ -42,14 +42,29 @@ def create_short_url(request):
     except IntegrityError:
         return error_response('Short URL creation failed. Try again!', status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-def retrive_original_url_by_short_url(request, short_code):
+@api_view(['GET', 'PUT'])
+def retrive_original_url_or_update_url(request, short_code):
 
     short_url = get_object_or_404(ShortURL, short_code=short_code)
 
-    serializer = ShortURLSerializer(short_url)
+    if request.method == 'GET':
+        serializer = ShortURLSerializer(short_url)
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'PUT':
+        new_url = request.data.get('original_url')
 
-def index(request):
-    return render(request, 'index.html')
+        if not new_url:
+            return error_response('New URL is required', status=status.HTTP_400_BAD_REQUEST)
+
+    
+        short_url.original_url = new_url
+        short_url.save()
+
+        serializer = ShortURLSerializer(short_url)
+        
+        return Response({
+            "message": "Short URL updated successfully",
+            "data": serializer.data
+        }, status=status.HTTP_200_OK) 

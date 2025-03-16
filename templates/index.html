@@ -61,12 +61,11 @@
         })
         .then(data => {
             if (data && data.original_url) {
-                window.location.href = data.original_url;  // Redirect user to the original URL
+                window.location.href = data.original_url;
             }
         })
         .catch(error => console.error("Error:", error));
     }
 </script>
-
 </body>
 </html>
