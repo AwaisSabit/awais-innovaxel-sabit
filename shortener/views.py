@@ -42,8 +42,8 @@ def create_short_url(request):
     except IntegrityError:
         return error_response('Short URL creation failed. Try again!', status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT'])
-def retrive_original_url_or_update_url(request, short_code):
+@api_view(['GET', 'PUT', 'DELETE'])
+def retrive_update_delete_url(request, short_code):
 
     short_url = get_object_or_404(ShortURL, short_code=short_code)
 
@@ -58,7 +58,13 @@ def retrive_original_url_or_update_url(request, short_code):
         if not new_url:
             return error_response('New URL is required', status=status.HTTP_400_BAD_REQUEST)
 
-    
+        existing_url = ShortURL.objects.filter(original_url=new_url).exclude(short_code=short_code).first()
+        if existing_url:
+            return Response({
+                "error": "This original URL is already associated with another short code.",
+                "existing_short_code": existing_url.short_code
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         short_url.original_url = new_url
         short_url.save()
 
@@ -67,4 +73,12 @@ def retrive_original_url_or_update_url(request, short_code):
         return Response({
             "message": "Short URL updated successfully",
             "data": serializer.data
-        }, status=status.HTTP_200_OK) 
+        }, status=status.HTTP_200_OK)
+    
+    elif request.method == 'DELETE':
+        short_url = get_object_or_404(ShortURL, short_code=short_code)
+
+        short_url.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
